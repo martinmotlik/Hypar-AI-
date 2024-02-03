@@ -1,0 +1,36 @@
+using System;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+
+namespace OpenAI_Hypar_Integration
+{
+    class Program
+    {
+        static readonly HttpClient client = new HttpClient();
+        static async Task Main(string[] args)
+        {
+            try
+            {
+                string apiKey = "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"; // Replace with your OpenAI API key
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
+
+                var prompt = "Create a 10 x 10 meter cube"; // Replace with your desired prompt
+                var data = new { prompt = prompt, max_tokens = 50 };
+                var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync("https://api.openai.com/v1/engines/davinci/completions", content);
+                response.EnsureSuccessStatusCode();
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine(responseBody);
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine("\nException Caught!");
+                Console.WriteLine("Message :{0} ", e.Message);
+            }
+        }
+    }
+}
